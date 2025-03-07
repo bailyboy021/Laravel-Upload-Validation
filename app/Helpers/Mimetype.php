@@ -21,11 +21,11 @@ class MimeType
         switch ($extension) {
             case 'jpg':
             case 'jpeg':
-                $validJpgBytes = [255, 216, 255, 224, 0, 16, 74, 70, 73, 70, 0, 1];
-                $listJpgBytes = array_values(unpack('C*', substr($content, 0, 12)));
+                $validJpgBytes = [255, 216, 255]; // Often followed by other bytes, checking just these is usually enough
+                $listJpgBytes = array_values(unpack('C*', substr($content, 0, 3)));
                 $listMatchJpgBytes = array_map(fn($v, $i) => $v == $validJpgBytes[$i], $listJpgBytes, array_keys($validJpgBytes));
                 $listNotMatchJpgBytes = array_filter($listMatchJpgBytes, fn($v) => $v === false);
-                return !in_array(false, $listMatchJpgBytes) || count($listNotMatchJpgBytes) <= 6;
+                return !in_array(false, $listMatchJpgBytes) || count($listNotMatchJpgBytes) <= 1; // Allow for one mismatch
 
             case 'png':
                 $validPngBytes = [137, 80, 78, 71, 13, 10, 26, 10];

@@ -36,7 +36,7 @@ $(document).ready(function() {
     $('#request_form').on('submit', function(e) {
         e.preventDefault();
 
-        var form = $('#request_form'),
+        let form = $('#request_form'),
             url = form.attr('action'),
             modalAdd = bootstrap.Modal.getInstance(document.getElementById('modal_add'));
 
@@ -56,8 +56,9 @@ $(document).ready(function() {
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
-                    // text: 'Data has been successfully submitted!',
-                    allowOutsideClick: false
+                    text: 'Data has been successfully submitted!',
+                    allowOutsideClick: false,
+                    timer: 2000
                 }).then(function() {
                     modalAdd.hide();
                     $('#data-file').DataTable().ajax.reload(); // Reload DataTable
@@ -67,10 +68,24 @@ $(document).ready(function() {
                 $("#submit_btn").show();
             },
             error: function(xhr) {
-                var res = xhr.responseJSON;
+                let res = xhr.responseJSON;
                 if ($.isEmptyObject(res) == false) {
                     $.each(res.errors, function(key, value) {
                         $('#' + key).closest('.form-control').addClass('is-invalid');
+                    });
+                }
+
+                if (xhr.status === 415) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: res.error,
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        text: 'Silakan coba lagi nanti.',
                     });
                 }
 

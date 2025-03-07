@@ -108,8 +108,8 @@
         </script>
         <script type="text/javascript">
             $(function() {
-                var csrf_token = '{{ csrf_token() }}';
-                var cats = $('#data-file').DataTable({
+                let csrf_token = '{{ csrf_token() }}';
+                let arsip = $('#data-file').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: 
@@ -142,6 +142,12 @@
                             "targets": [ 0, 1 ],
                             "orderable": false, 
                         },
+                        { 
+                            "targets": [ 0 ],
+                            "createdCell": function (td, cellData, rowData, row, col) {
+                                $(td).css('text-align', 'center');  // Menambahkan text-center pada ID
+                            }
+                        }
                     ],
                             
                     order: [],

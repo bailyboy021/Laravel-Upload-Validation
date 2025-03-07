@@ -16,18 +16,22 @@ class ArchiveController extends Controller
         $encrypt = new Encrypt;
 
         if($request->ajax()) {				
-			$model = Archive::orderBy('file_name', 'asc')->get();
+			$model = Archive::orderBy('id', 'desc')->get();
 		
             return Datatables::of($model)
 			->editColumn('id', function ($model) use ($encrypt){
 				return $encrypt->encrypt_decrypt($model->id, 'encrypt');
+            })
+            ->editColumn('file_name', function ($model) {
+                $filePath = asset('archive/' . $model->file_name);
+                return '<a href="' . $filePath . '" target="_blank">' . $model->file_name . '</a>';
             })
 			
 			->addIndexColumn()
 			->addColumn('action', function($row){
 
 			})
-			->rawColumns(['action'])
+			->rawColumns(['action','file_name'])
 			->make(true);
         }
     }
@@ -51,7 +55,10 @@ class ArchiveController extends Controller
         $filename = $file->getClientOriginalName();
 
         if (!MimeType::whiteList($filename) || !MimeType::whiteListBytes($content, $filename)) {
-            abort(415, 'File tidak valid atau tidak diizinkan.');
+            $errors = 'File tidak valid atau tidak diizinkan!';
+            return response()->json([
+                'error' => $errors,
+            ], 415);
         }
 		
 		$kode = DB::table('archives')->max('id');
